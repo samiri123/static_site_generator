@@ -1,5 +1,7 @@
 import unittest
 from htmlnode import LeafNode, ParentNode, HTMLNode
+from textnode import TextNode, TextType
+from text_to_html import text_node_to_html_node
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -107,7 +109,21 @@ class TestHTMLNode(unittest.TestCase):
             node.to_html(),
             "<h2><b>Bold text</b>Normal text<i>italic text</i>Normal text</h2>",
         )
-
-
+    
+    def test_text(self):
+        node = TextNode("This is a text node", TextType.TEXT)
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, None)
+        self.assertEqual(html_node.value, "This is a text node")
+        
+    def test_img(self):
+        node = TextNode("This is deine mutti image", TextType.IMAGE, url="deine_mutti.png")
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "img")
+        self.assertEqual(html_node.props["alt"], "This is deine mutti image")
+    
+    def test_unknown_text_type(self):
+        node = TextNode("This is a text node", "unknown")
+        self.assertRaises(Exception, text_node_to_html_node, node)
 if __name__ == "__main__":
     unittest.main()
