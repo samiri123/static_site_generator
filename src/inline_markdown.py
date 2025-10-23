@@ -74,9 +74,10 @@ def split_nodes_link(old_nodes):
             new_nodes.append(TextNode(original_text, TextType.TEXT))
     return new_nodes
 
-node = TextNode(
-    "This is text with a [link](https://boot.dev) and [another link](https://blog.boot.dev) with text that follows",
-    TextType.TEXT,
-)
-new_nodes = split_nodes_link([node])
-print(new_nodes)
+def text_to_textnodes(text: str):
+    original_text_node = TextNode(text, TextType.TEXT)
+    split_bold = split_nodes_delimiter([original_text_node], "**", TextType.BOLD)
+    split_italic = split_nodes_delimiter(split_bold, "_", TextType.ITALIC)
+    split_code = split_nodes_delimiter(split_italic, "`", TextType.CODE)
+    split_image = split_nodes_image(split_code)
+    return split_nodes_link(split_image) 
