@@ -25,53 +25,45 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type: TextType):
 def split_nodes_image(old_nodes):
     new_nodes = []
     for old_node in old_nodes:
-        if old_node.text_type != TextType.TEXT:
+        if old_node.text_type != TextType.TEXT: #old nodes are of type text
             new_nodes.append(old_node)
             continue
-        original_text = old_node.text
-        images = extract_markdown_images(original_text)
-        if len(images) == 0:
+        text = old_node.text # original text
+        images = extract_markdown_images(text)
+        if len(images) == 0: #no images found
             new_nodes.append(old_node)
             continue
-        split_nodes = []
-        count = 0
-        sections = []
-        while count < len(images):
-            sections = original_text.split(f"![{images[count][0]}]({images[count][1]})", 1)
-            if sections[0] != "":
-                split_nodes.append(TextNode(sections[0], TextType.TEXT))
-            split_nodes.append(TextNode(images[count][0], TextType.IMAGE, images[count][1]))
-            original_text = sections[1]
-            count += 1
-        new_nodes.extend(split_nodes)
-        if original_text != "":
-            new_nodes.append(TextNode(original_text, TextType.TEXT))
+        for image in images:
+            sections = text.split(f"![{image[0]}]({image[1]})", 1) #split only once -> two parts
+            if sections[0] != "": #first part is not empty -> add it
+                new_nodes.append(TextNode(sections[0], TextType.TEXT)) 
+            new_nodes.append(TextNode(image[0], TextType.IMAGE, image[1])) #add the image itself
+            text = sections[1] #second part becomes the new text
+        if text != "":
+            new_nodes.append(TextNode(text, TextType.TEXT)) #add the last section 
     return new_nodes
 
+#it's similar to above function
 def split_nodes_link(old_nodes):
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
             continue
-        original_text = old_node.text
-        links = extract_markdown_links(original_text)
+        text = old_node.text
+        links = extract_markdown_links(text)
         if len(links) == 0:
             new_nodes.append(old_node)
             continue
-        split_nodes = []
-        count = 0
         sections = []
-        while count < len(links):
-            sections = original_text.split(f"[{links[count][0]}]({links[count][1]})", 1)
+        for link in links:
+            sections = text.split(f"[{link[0]}]({link[1]})", 1)
             if sections[0] != "":
-                split_nodes.append(TextNode(sections[0], TextType.TEXT))
-            split_nodes.append(TextNode(links[count][0], TextType.LINK, links[count][1]))
-            original_text = sections[1]
-            count += 1
-        new_nodes.extend(split_nodes)
-        if original_text != "":
-            new_nodes.append(TextNode(original_text, TextType.TEXT))
+                new_nodes.append(TextNode(sections[0], TextType.TEXT))
+            new_nodes.append(TextNode(link[0], TextType.LINK, link[1]))
+            text = sections[1]
+        if text != "":
+            new_nodes.append(TextNode(text, TextType.TEXT))
     return new_nodes
 
 def text_to_textnodes(text: str):
