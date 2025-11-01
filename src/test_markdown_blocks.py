@@ -3,6 +3,7 @@ from markdown_blocks import (
     markdown_to_html_node,
     markdown_to_blocks,
     block_to_block_type,
+    extract_title,
     BlockType,
 )
 
@@ -164,5 +165,10 @@ the **same** even with inline stuff
         )
 
 
+    def test_extract_markdown_title(self):
+        self.assertEqual("This is an H1", extract_title("# This is an H1"))
+        self.assertRaises(Exception, extract_title, "## This is an H2")
+        self.assertRaises(Exception, extract_title, "#NoSpaceH1")
+        self.assertRaises(Exception, extract_title, "This is just text")
 if __name__ == "__main__":
     unittest.main()

@@ -42,6 +42,21 @@ def block_to_block_type(block: str):
         return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
 
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        block_type = block_to_block_type(block)
+        if block_type != BlockType.HEADING:
+            continue
+        else:
+            if not block.startswith('# '):
+                continue
+            return block[2: ].strip()
+    raise Exception("The markdown does not have an h1 header") 
+    
+    
+#####################Markdown to HTML############################
+
 def markdown_to_html_node(markdown):
     children = []
     blocks = markdown_to_blocks(markdown)
