@@ -22,8 +22,8 @@ def generate_page(basepath, from_path, template_path, dest_path):
     html_string = markdown_to_html_node(from_path_content).to_html()
     template_content = template_content.replace("{{ Title }}", title)
     template_content = template_content.replace("{{ Content }}", html_string)
-    template_content = template_content.replace('/href="', basepath)
-    template_content = template_content.replace('/src="', basepath)
+    template_content = template_content.replace('href="/', 'href="' + basepath)
+    template_content = template_content.replace('src="/', 'src="' + basepath)
     project_abs = os.path.abspath(".")
     dest_path_abs = os.path.abspath(dest_path)
     if not os.path.exists(dest_path):
