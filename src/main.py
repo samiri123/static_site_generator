@@ -5,7 +5,7 @@ import sys
 def main():
     copy_static()
     basepath = sys.argv[0]
-    if basepath is None:
+    if basepath == "":
         basepath = "/"
     generate_pages_recursive( '/', 'content', './template.html', 'docs')
     
