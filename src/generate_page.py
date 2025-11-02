@@ -1,8 +1,8 @@
 import os
-import pathlib
+from pathlib import Path
 from markdown_blocks import markdown_to_html_node, extract_title
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(basepath, from_path, template_path, dest_path):
     print(f"Generating from {from_path} to {dest_path} using {template_path}")
     if os.path.exists(from_path):
         if os.path.exists(template_path):
@@ -22,6 +22,8 @@ def generate_page(from_path, template_path, dest_path):
     html_string = markdown_to_html_node(from_path_content).to_html()
     template_content = template_content.replace("{{ Title }}", title)
     template_content = template_content.replace("{{ Content }}", html_string)
+    template_content = template_content.replace('/href="', basepath)
+    template_content = template_content.replace('/src="', basepath)
     project_abs = os.path.abspath(".")
     dest_path_abs = os.path.abspath(dest_path)
     if not os.path.exists(dest_path):
@@ -48,23 +50,16 @@ def generate_page(from_path, template_path, dest_path):
             return f"Error: something went wrong writing the file: {e}"
     
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
-    content_paths = get_paths(dir_path_content, [])
-    for path in content_paths:
-        relative_path = path.relative_to(dir_path_content)
-        dest_path = os.path.join(dest_dir_path, relative_path.parent)
-        os.makedirs(dest_path, exist_ok=True)
-        generate_page(str(path), template_path, os.path.join(dest_path, f"{path.stem}.html"))
 
-def get_paths(dir_path, path_list):
-    content_paths = os.listdir(dir_path)
-    for path in content_paths:
-        join_path = os.path.join(dir_path, path)
-        if os.path.isdir(join_path):
-            get_paths(join_path, path_list)
+def generate_pages_recursive(basepath, dir_path_content, template_path, dest_dir_path):
+    for filename in os.listdir(dir_path_content):
+        from_path = os.path.join(dir_path_content, filename)
+        dest_path = os.path.join(dest_dir_path, filename)
+        if os.path.isfile(from_path):
+            dest_path = Path(dest_path).with_suffix(".html")
+            generate_page(basepath, from_path, template_path, dest_path)
         else:
-            if join_path.endswith("md"):
-                path_list.append(pathlib.Path(join_path))
-    return path_list           
+            generate_pages_recursive(basepath, from_path, template_path, dest_path)
+         
     
     

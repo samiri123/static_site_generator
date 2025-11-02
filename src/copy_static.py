@@ -2,14 +2,14 @@ import os
 import shutil
 
 def copy_static():
-    if os.path.exists('public'):
+    if os.path.exists('docs'):
         try:
-            shutil.rmtree('public')
+            shutil.rmtree('docs')
         except Exception as e:
             print(f"Something went wrong during the deletion: {e}")
-    if not os.path.exists('public'):
-        os.mkdir('public')
-    copy_dir('static', 'public')
+    if not os.path.exists('docs'):
+        os.mkdir('docs')
+    copy_dir('static', 'docs')
 
 def copy_dir(src_dir, tar_dir):
     if not os.path.exists(src_dir):
